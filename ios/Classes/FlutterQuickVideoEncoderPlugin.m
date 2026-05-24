@@ -153,7 +153,10 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
                 // Initialize video input
                 self.mVideoInput = [[AVAssetWriterInput alloc] initWithMediaType:AVMediaTypeVideo
                                                                 outputSettings:videoSettings];
-                self.mVideoInput.expectsMediaDataInRealTime = YES;
+                // Fix Issue #13: NO is required for pre-rendered frames (PictureRecorder/RepaintBoundary).
+                // YES is appropriate only for live capture (camera/screen).
+                // See https://github.com/chipweinberger/flutter_quick_video_encoder/issues/13
+                self.mVideoInput.expectsMediaDataInRealTime = NO;
 
                 // Add video input to asset writer
                 if (![self.mAssetWriter canAddInput:self.mVideoInput]) {
@@ -180,7 +183,8 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
                 // Initialize audio input
                 self.mAudioInput = [[AVAssetWriterInput alloc] initWithMediaType:AVMediaTypeAudio
                                                                 outputSettings:audioSettings];
-                self.mAudioInput.expectsMediaDataInRealTime = YES;
+                // Fix Issue #13 (audio side): NO for pre-rendered frames.
+                self.mAudioInput.expectsMediaDataInRealTime = NO;
 
                 // Add audio input to asset writer
                 if (![self.mAssetWriter canAddInput:self.mAudioInput]) {
